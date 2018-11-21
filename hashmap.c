@@ -47,14 +47,14 @@ void hm_put(struct hashmap* hm, char* word, char* document_id, int num_occurrenc
     int i;
     for(i=0; i<hm->num_buckets; i++)
     {
-        if(0==strcmp(word, hm->map[i]))
+        if(0==strcmp(word, hm->map[i]->word))
         {
             break;
         }
     }
     if(i >= hm->num_buckets)
     {
-        return -1;
+        //create a bucket
     }
     struct lnode* a = hm->map[i];
     a=a->next;
@@ -62,7 +62,7 @@ void hm_put(struct hashmap* hm, char* word, char* document_id, int num_occurrenc
     {
          if(0==strcmp(a->document_id,document_id))
          {
-            ++a->num_occurrences;
+            a->num_occurrences++;
             return;
          }
          a=a->next;
