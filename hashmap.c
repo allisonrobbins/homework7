@@ -13,12 +13,13 @@ struct hashmap* hm_create(int num_buckets)
 }
 int hm_get(struct hashmap* hm, char* word, char* document_id)
 {
-    int bucket = hash(hm,word,document_id);//the index array of the bucket
+    int bucket = hash(hm,word,document_id);
+    printf("Hash # for %s is %i\n",word,bucket);
     struct llnode *top = hm->map[bucket];
     if(top==NULL)//tests if there are any nodes in the bucket
     {
-      printf("made it here\n");
-      return -1;
+      printf("made it here 1\n");
+      //return -1;
     }
     struct llnode *iter = top;
     if(iter->next ==NULL)
@@ -74,7 +75,7 @@ void hm_put(struct hashmap* hm, char* word, char* document_id, int num_occurrenc
       if(strcmp(iter->document_id,document_id)==0)
         {
             iter->num_occurrences = iter->num_occurrences + num_occurrences;//if the word and document id match, increment num_occurrences
-            printf("incrementing num_occurrences to %i\n",iter->num_occurrences);
+            printf("added it: %s %s %i\n",iter->word,iter->document_id,iter->num_occurrences);
             return;
         }
         printf("adding to the linked list\n");
@@ -140,12 +141,14 @@ void hm_destroy(struct hashmap* hm)
 }
 int hash(struct hashmap* hm, char* word, char* document_id)
 {
+    char* a;
     int i;
-    int sum;
+    int sum = 0;
     char* getRidOfDumbError = document_id;
-    for(i=0; i<(int)strlen(word); i++)
+    for(a = word; *a!='\0'; a++)
     {
-        sum = sum + word[i];
+      i = (int) *a;
+      sum = sum + i;
     }
     sum = sum%hm->num_buckets;
     getRidOfDumbError++;
