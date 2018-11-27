@@ -14,112 +14,130 @@ struct hashmap* hm_create(int num_buckets)
 int hm_get(struct hashmap* hm, char* word, char* document_id)
 {
     int bucket = hash(hm,word,document_id);//the index array of the bucket
-    if(bucket>=hm->num_buckets)
+    struct llnode *top = hm->map[bucket];
+    if(top==NULL)//tests if there are any nodes in the bucket
     {
+      printf("made it here\n");
       return -1;
     }
-    struct llnode *a = hm->map[bucket];
-    struct llnode *b = a;
-    if(b==NULL)
+    struct llnode *iter = top;
+    if(iter->next ==NULL)
     {
-      printf("b==null\n");
-       printf("there is no key value pair to match %s %s 1\n",word,document_id);
-      return -1;
+      printf("made it here 2\n");
+      if(strcmp(iter->document_id,document_id)==0 && strcmp(iter->word,word)==0)//check for same document #
+        {
+            printf("the number of occurrences for %s %s is %i\n",word,document_id,iter->num_occurrences);  
+            return iter->num_occurrences;//if they match, return the number of occurrences
+        }
+      iter = iter->next;
     }
-    if(b->next == NULL)
+    while(iter->next != NULL)//iterate through all nodes in the bucket
     {
-      printf("b->next == NULL\n");
-      if(strcmp(b->document_id,document_id)==0 && strcmp(b->word,word)==0)//check for same document #
+      printf("made it here 3\n");
+        if(strcmp(iter->document_id,document_id)==0 && strcmp(iter->word,word)==0)//check for same document #
         {
-          printf("the number of occur for %s %s is %i\n",word,document_id,b->num_occurrences);    
-          return b->num_occurrences;//if they match, return the number of occurrences
+            printf("the number of occurrences for %s %s is %i\n",word,document_id,iter->num_occurrences);  
+            return iter->num_occurrences;//if they match, return the number of occurrences
         }
-      printf("there is no key value pair to match %s %s 2\n",word,document_id);
-      return -1;
+        iter = iter->next;//keep iterating
     }
-    while(b->next != NULL)//iterate through all nodes in the bucket
+    if(strcmp(iter->document_id,document_id)==0 && strcmp(iter->word,word)==0)//check for same document #
     {
-        printf("iterating...\n");
-        if(strcmp(b->document_id,document_id)==0 && strcmp(b->word,word)==0)//check for same document #
-        {
-          printf("the number of occur for %s %s is %i\n",word,document_id,b->num_occurrences);  
-          return b->num_occurrences;//if they match, return the number of occurrences
-        }
-        b = b->next;//keep iterating
+        printf("the number of occurrences for %s %s is %i\n",word,document_id,iter->num_occurrences);  
+        return iter->num_occurrences;//if they match, return the number of occurrences
     }
-    if(strcmp(b->document_id,document_id)==0 && strcmp(b->word,word)==0)//check for same document #
-        {
-          printf("the number of occur for %s %s is %i\n",word,document_id,b->num_occurrences);    
-          return b->num_occurrences;//if they match, return the number of occurrences
-        }
-    printf("there is no key value pair to match %s %s 3\n",word,document_id);
-    return -1;//if there is no match, return -1 to show error
+    printf("there is no key value pair to match %s %s\n",word,document_id);
+    return -1;
 }
 void hm_put(struct hashmap* hm, char* word, char* document_id, int num_occurrences)
 {
     int bucket = hash(hm,word,document_id);
     printf("Hash # for %s is %i\n",word,bucket);
     //int bucket = 1; 
-    struct llnode *a = hm->map[bucket];
-    struct llnode *c = a;
-    if(c == NULL)
+    struct llnode *head = hm->map[bucket];
+    if(head == NULL)
     {
       printf("there is no first node in the bucket\n");
-      c = (struct llnode*)malloc(sizeof(struct llnode));
-      c->word = word;//initialize the data in b
-      c->document_id = document_id;
-      c->num_occurrences = num_occurrences;//now the combo exists once
-      c->next = NULL;//no node comes after
-      printf("added it: %s %s %i\n",c->word,c->document_id,c->num_occurrences);
+      head = (struct llnode*)malloc(sizeof(struct llnode));
+      head->word = word;//initialize the data in b
+      head->document_id = document_id;
+      head->num_occurrences = num_occurrences;//now the combo exists once
+      head->next = NULL;//no node comes after
+      printf("added it: %s %s %i\n",head->word,head->document_id,head->num_occurrences);
       hm->num_elements++;//another lnode was added, so increment num_elements
       return;
     }
-    if(c->next == NULL)
+    struct llnode *iter = head;
+    if(iter->next == NULL)
     {
       printf("I made it here\n");
-      if(strcmp(c->document_id,document_id)==0)
+      if(strcmp(iter->document_id,document_id)==0)
         {
-            c->num_occurrences = c->num_occurrences + num_occurrences;//if the word and document id match, increment num_occurrences
+            iter->num_occurrences = iter->num_occurrences + num_occurrences;//if the word and document id match, increment num_occurrences
+            printf("incrementing num_occurrences to %i\n",iter->num_occurrences);
             return;
         }
         printf("adding to the linked list\n");
-        c->next = (struct llnode*)malloc(sizeof(struct llnode));
-        c->next->word = word;//initialize the data in b
-        c->next->document_id = document_id;
-        c->next->num_occurrences = num_occurrences;//now the combo exists once
-        c->next->next = NULL;//no node comes after
-        printf("added it: %s %s %i\n",c->next->word,c->next->document_id,c->next->num_occurrences);
+        iter->next = (struct llnode*)malloc(sizeof(struct llnode));
+        iter = iter->next;
+        iter->word = word;//initialize the data in b
+        iter->document_id = document_id;
+        iter->num_occurrences = num_occurrences;//now the combo exists once
+        iter->next = NULL;//no node comes after
+        printf("added it: %s %s %i\n",iter->word,iter->document_id,iter->num_occurrences);
         hm->num_elements++;//another lnode was added, so increment num_elements
       }
     //this loop iterates through all the nodes in each bucket and finds one with a matching document id
-    while(c->next!=NULL)
+    while(iter->next!=NULL)
     {
       printf("iterating...\n");
-        if(strcmp(c->document_id,document_id)==0)
+        if(strcmp(iter->document_id,document_id)==0)
         {
-            c->num_occurrences = c->num_occurrences + num_occurrences;//if the word and document id match, increment num_occurrences
+            iter->num_occurrences = iter->num_occurrences + num_occurrences;//if the word and document id match, increment num_occurrences
+            printf("incrementing num_occurrences to %i\n",iter->num_occurrences);
             return;
         }
-        c = c->next;//otherwise, continue iterating through linked list
+        iter = iter->next;//otherwise, continue iterating through linked list
     }//if there is no node for that document, add one
-   if(strcmp(c->document_id,document_id)==0 && strcmp(c->word,word)==0)//check for same document #
-        {
-          printf("the number of occur for %s %s is %i\n",word,document_id,b->num_occurrences);    
-          c->num_occurrences = c->num_occurrences +num_occurrences;//if they match, return the number of occurrences
-        }
+   if(strcmp(iter->document_id,document_id)==0 && strcmp(iter->word,word)==0)//check for same document #
+    {
+        iter->num_occurrences = iter->num_occurrences +num_occurrences;//if the word and document id match, increment num_occurrences
+        return;
+    }
     printf("adding to the linked list\n");
-    c->next =(struct llnode*)malloc(sizeof(struct LNode));
-    c->next->word = word;//initialize the data in b
-    c->next->document_id = document_id;
-    c->next->num_occurrences = num_occurrences;//now the combo exists once
-    c->next->next = NULL;//no node comes after
-    printf("added it: %s %s %i\n",c->next->word,c->next->document_id,c->next->num_occurrences);
+    iter->next =(struct llnode*)malloc(sizeof(struct llnode));
+    iter = iter->next;
+    iter->word = word;//initialize the data in b
+    iter->document_id = document_id;
+    iter->num_occurrences = num_occurrences;//now the combo exists once
+    iter->next = NULL;//no node comes after
+    printf("added it: %s %s %i\n",iter->word,iter->document_id,iter->num_occurrences);
     hm->num_elements++;//another lnode was added, so increment num_elements
 }
-/*void hm_destroy(struct hashmap* hm)
+void hm_destroy(struct hashmap* hm)
 {
-    
-}*/
+    if(hm->map == NULL)
+    {
+      return;
+    }
+    int i;
+    for(i=0; i<hm->num_buckets; i++)
+    {
+        struct llnode* iter;
+        struct llnode* trail = hm->map[i];
+        while(trail != NULL)
+        {
+          iter = trail->next;
+          free(trail);
+          trail = iter;
+        }
+        free(trail);
+        free(iter);
+        free(hm->map[i]);
+    }
+    free(hm->map);
+    free(hm);
+}
 int hash(struct hashmap* hm, char* word, char* document_id)
 {
     int i;
