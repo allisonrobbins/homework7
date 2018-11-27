@@ -158,3 +158,4 @@ int hash(struct hashmap* hm, char* word, char* document_id)
 //{
 
 //}
+
