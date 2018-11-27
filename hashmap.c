@@ -40,44 +40,13 @@ int hm_get(struct hashmap* hm, char* word, char* document_id)
       }
     printf("the number of occurrences for %s %s is 0. Returning -1.\n",word,document_id);
     return -1;
-  
-  /*int bucket = hash(hm,word,document_id);
-    printf("Hash # for %s is %i\n",word,bucket);
-    struct llnode *top = hm->map[bucket];
-    if(top==NULL)//tests if there are any nodes in the bucket
-    {
-      printf("there are none of that word in this file\n");
-      return -1;
-    }
-    if(strcmp(top->word,word)!=0)
-    {
-      return -1;
-    }
-    struct llnode *iter = top;
-    while(iter->next != NULL)//iterate through all nodes in the bucket
-    {
-      printf("made it here 3\n");
-        if(strcmp(iter->document_id,document_id)==0 && strcmp(iter->word,word)==0)//check for same document #
-        {
-            printf("the number of occurrences for %s %s is %i\n",word,document_id,iter->num_occurrences);  
-            return iter->num_occurrences;//if they match, return the number of occurrences
-        }
-        iter = iter->next;//keep iterating
-    }
-    if(strcmp(iter->document_id,document_id)==0 && strcmp(iter->word,word)==0)//check for same document #
-    {
-        printf("the number of occurrences for %s %s is %i\n",word,document_id,iter->num_occurrences);  
-        return iter->num_occurrences;//if they match, return the number of occurrences
-    }
-    printf("there is no key value pair to match %s %s\n",word,document_id);
-    return -1;*/
 }
 void hm_put(struct hashmap* hm, char* word, char* document_id, int num_occurrences){
 	int bucket = hash(hm, word, document_id);
   printf("Adding word: %s doc: %s to bucket %i\n",word,document_id,bucket);
 	struct llnode* headBucket = hm->map[bucket];
 	if (headBucket == NULL) {
-		struct llnode* new_node = (struct llnode*) malloc(sizeof(struct llnode));
+		struct llnode* new_node = (struct llnode*) calloc(1,sizeof(struct llnode));
 		hm->map[bucket] = new_node;
 		new_node->word = word;
 		new_node->document_id = document_id;
@@ -99,7 +68,7 @@ void hm_put(struct hashmap* hm, char* word, char* document_id, int num_occurrenc
 		}
 		/* Add node to end of list */
     printf("adding to the end of bucket %i\n",bucket);
-		struct llnode* new_node = (struct llnode*) malloc(sizeof(struct llnode));
+		struct llnode* new_node = (struct llnode*) calloc(1,sizeof(struct llnode));
 		new_node->word = word;
 		new_node->document_id = document_id;
 		new_node->num_occurrences = num_occurrences;
@@ -110,25 +79,24 @@ void hm_put(struct hashmap* hm, char* word, char* document_id, int num_occurrenc
 }
 void hm_destroy(struct hashmap* hm)
 {
-    if(hm->map == NULL)
-    {
-      return;
-    }
     int i;
     for(i=0; i<hm->num_buckets; i++)
     {
-        struct llnode* iter;
-        struct llnode* trail = hm->map[i];
-        while(trail != NULL)
+      printf("destroying bucket %i\n",i);
+        struct llnode* trail;
+        struct llnode* iter = hm->map[i];
+        while(iter != NULL && iter !=0)
         {
-          iter = trail->next;
-          free(trail);
           trail = iter;
+          iter = iter->next;
+          free(trail);
         }
-        free(trail);
-        free(iter);
-        free(hm->map[i]);
+        if(iter == NULL)
+        {
+          printf("iter is null\n");
+        }
     }
+    printf("destroying map and hm");
     free(hm->map);
     free(hm);
 }
@@ -147,8 +115,49 @@ int hash(struct hashmap* hm, char* word, char* document_id)
     getRidOfDumbError++;
     return sum;
 }
-//void hm_remove(struct hashmap* hm, char* word, char* document_id)
-//{
-
-//}
+void hm_remove(struct hashmap* hm, char* word, char* document_id)
+{
+  int bucket = hash(hm,word,document_id);
+  struct llnode* headBucket = hm->map[bucket];
+  if(headBucket == NULL)
+  {
+    printf("key value pair not found\n");
+  }
+  struct llnode* trail = headBucket;
+  struct llnode* iter = headBucket->next;
+  //removing the only node in a bucket...
+  if(iter == NULL && strcmp(trail->word,word)==0 && strcmp(trail->document_id,document_id)==0)
+  {
+    hm->map[bucket]=NULL;
+    free(headBucket);
+    hm->num_elements--;
+    return;
+  }
+  //if the node to be deleted is a head node (1st in the bucket)...
+  else if(strcmp(trail->word,word)==0 && strcmp(trail->document_id,document_id)==0)
+  {
+    trail->next = NULL;
+    free(trail);
+    hm->map[bucket] = iter;
+    hm->num_elements--;
+    return;
+  }
+  //checking the rest of the list to find matching key value pair
+  while(iter != NULL)
+  {
+    if(strcmp(iter->word,word)==0 && strcmp(iter->document_id,document_id)==0)
+    {
+      trail->next = iter->next;
+      iter->next = NULL;
+      free(iter);
+      hm->num_elements--;
+      return;
+    }
+    else{
+      iter = iter->next;
+      trail = trail->next;
+    }
+  }
+  printf("reached end of list, key value pair not found.\n");
+}
 

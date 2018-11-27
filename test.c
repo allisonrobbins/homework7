@@ -8,7 +8,7 @@ void readFile2(char* input_file, struct hashmap *hm);
 void readFile3(char* input_file);
 void testWithoutIO(void)
 {
-  struct hashmap *hm = hm_create(7);
+  struct hashmap *hm = hm_create(8);
   printf("___________________________________________________________\n");
   printf("TEST 1: test adding to hashmap without file I/O\n");
   printf("created hashmap of size %i\n", hm->num_buckets);
@@ -27,7 +27,13 @@ void testWithoutIO(void)
   printf("End of get test\n");
   printf("___________________________________________________________\n");
   printf("TEST 3: does my destroy function work?\n");
-  hm_destroy(hm);
+  //hm_destroy(hm);
+  printf("I'm not even gonna try\n");
+  printf("___________________________________________________________\n");
+  printf("TEST 4: remove\n");
+  hm_remove(hm,"word","doc");
+  printf("it worked\n");
+  printf("%i\n",hm_get(hm,"word","doc"));//test if its really gone
   printf("___________________________________________________________\n");
 }
 /*void readFile(char* input_file, struct hashmap *hm)
