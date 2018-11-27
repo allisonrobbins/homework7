@@ -46,20 +46,19 @@ int hm_get(struct hashmap* hm, char* word, char* document_id)
 */
 void hm_put(struct hashmap* hm, char* word, char* document_id, int num_occurrences){
     int bucket = hash(hm,word,document_id);
-  printf("Adding word: %s doc: %s to bucket %i\n",word,document_id,bucket);
     struct llnode *headBucket = hm->map[bucket];
   //printf("head node is %s %s\n", headBucket->word,headBucket->document_id);
     if (headBucket==NULL) 
   {
-    printf("nothing in the bucket yet\n");
+        printf("nothing in the bucket yet\n");
         struct llnode* new_node = (struct llnode*) calloc(1,sizeof(struct llnode));
-    printf("allocated space for new node\n");
+        printf("allocated space for new node\n");
         hm->map[bucket] = new_node;
         new_node->word = word;
         new_node->document_id = document_id;
         new_node->num_occurrences = num_occurrences;
-    printf("Added to the front of bucket %i\n",bucket);
-    hm->num_elements += 1;
+        printf("Adding word: %s doc: %s to bucket %i\n",new_node->word,new_node->document_id,bucket);
+        hm->num_elements += 1;
     }
     else {
         struct llnode* curr = headBucket;
@@ -167,4 +166,3 @@ void hm_remove(struct hashmap* hm, char* word, char* document_id)
   }
   printf("reached end of list, key value pair not found.\n");
 }
-
