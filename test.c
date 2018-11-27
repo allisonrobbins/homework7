@@ -19,13 +19,16 @@ void testWithoutIO(void)
   printf("End of add test\n");
   printf("___________________________________________________________\n");
   printf("TEST 2: test get without file I/O\n");
-  printf("%i\n",hm_get(hm,"word","doc"));
+  printf("%i\n",hm_get(hm,"word","doc"));//test that everything was inputted correctly
   printf("%i\n",hm_get(hm,"word","doc2"));
   printf("%i\n",hm_get(hm,"longword","doc2"));
-  printf("%i\n",hm_get(hm,"bleh","doc"));
+  printf("%i\n",hm_get(hm,"longword","doc3"));//test a document that does not exist
+  //printf("%i\n",hm_get(hm,"bleh","doc"));//test a word that does not exist
   printf("End of get test\n");
   printf("___________________________________________________________\n");
+  printf("TEST 3: does my destroy function work?\n");
   hm_destroy(hm);
+  printf("___________________________________________________________\n");
 }
 /*void readFile(char* input_file, struct hashmap *hm)
 {
@@ -72,7 +75,7 @@ void readFile2(char* input_file,struct hashmap *hm)
     char arr[50];
     curr = (char)fgetc(fptr);
     int k=0;
-    while(curr!=' ')
+    while(curr!=' ' && curr!= EOF)
     {
       arr[k++] = curr;
       curr = (char)fgetc(fptr);
@@ -84,6 +87,10 @@ void readFile2(char* input_file,struct hashmap *hm)
       printf("%c",arr[i]);
     }
     printf(" \n");
+    if(curr == EOF)
+    {
+      return;
+    }
   }
   printf("\n");
 }
@@ -100,7 +107,7 @@ void readFile3(char* input_file)
     char arr[50];
     curr = (char)fgetc(fptr);
     int k=0;
-    while(curr!=' ')
+    while(curr!=' ' && curr!= EOF)
     {
       arr[k++] = curr;
       curr = (char)fgetc(fptr);
@@ -120,11 +127,17 @@ void readFile3(char* input_file)
 }
 int main(void)
 {
-  //testWithoutIO();
-  //struct hashmap *hm = hm_create(17);
-  printf("I made a hashmap\n");
-  readFile3("input1.txt");
+  testWithoutIO();
+  
+ // struct hashmap *hm = hm_create(17);
+  //printf("I made a hashmap\n");
+  /*readFile3("input1.txt");
   readFile3("input2.txt");
-  readFile3("input3.txt");
+  readFile3("input3.txt");*/
+  
+  /*readFile2("input1.txt",hm);
+  readFile2("input2.txt",hm);
+  readFile2("input3.txt",hm);*/
+  
 }
 

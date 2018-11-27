@@ -13,25 +13,47 @@ struct hashmap* hm_create(int num_buckets)
 }
 int hm_get(struct hashmap* hm, char* word, char* document_id)
 {
-    int bucket = hash(hm,word,document_id);
+  //printf("Made it to get method\n");  
+  int bucket = hash(hm,word,document_id);
+    struct llnode* top = hm->map[bucket];
+    if(top == NULL)
+    {
+      printf("there is nothing in bucket %i\n",bucket);
+      printf("the number of occurrences for %s %s is 0. Returning -1.\n",word,document_id);
+      return -1;
+    }
+    //printf("bucket %i is not empty\n",bucket);
+    struct llnode* iter = top;
+    while(iter->next != NULL)
+    {
+      if(strcmp(iter->document_id,document_id)==0 && strcmp(iter->word,word)==0)
+      {
+        printf("the number of occurrences for %s %s is %i\n",word,document_id,iter->num_occurrences);  
+        return iter->num_occurrences;//if they match, return the number of occurrences
+      }
+      iter = iter->next;
+    }
+    if(strcmp(iter->document_id,document_id)==0 && strcmp(iter->word,word)==0)
+      {
+        printf("the number of occurrences for %s %s is %i\n",word,document_id,iter->num_occurrences);  
+        return iter->num_occurrences;//if they match, return the number of occurrences
+      }
+    printf("the number of occurrences for %s %s is 0. Returning -1.\n",word,document_id);
+    return -1;
+  
+  /*int bucket = hash(hm,word,document_id);
     printf("Hash # for %s is %i\n",word,bucket);
     struct llnode *top = hm->map[bucket];
     if(top==NULL)//tests if there are any nodes in the bucket
     {
-      printf("made it here 1\n");
-      //return -1;
+      printf("there are none of that word in this file\n");
+      return -1;
+    }
+    if(strcmp(top->word,word)!=0)
+    {
+      return -1;
     }
     struct llnode *iter = top;
-    if(iter->next ==NULL)
-    {
-      printf("made it here 2\n");
-      if(strcmp(iter->document_id,document_id)==0 && strcmp(iter->word,word)==0)//check for same document #
-        {
-            printf("the number of occurrences for %s %s is %i\n",word,document_id,iter->num_occurrences);  
-            return iter->num_occurrences;//if they match, return the number of occurrences
-        }
-      iter = iter->next;
-    }
     while(iter->next != NULL)//iterate through all nodes in the bucket
     {
       printf("made it here 3\n");
@@ -48,7 +70,7 @@ int hm_get(struct hashmap* hm, char* word, char* document_id)
         return iter->num_occurrences;//if they match, return the number of occurrences
     }
     printf("there is no key value pair to match %s %s\n",word,document_id);
-    return -1;
+    return -1;*/
 }
 void hm_put(struct hashmap* hm, char* word, char* document_id, int num_occurrences){
 	int bucket = hash(hm, word, document_id);
