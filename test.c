@@ -59,14 +59,16 @@ void testWithoutIO(void)
   }
   fclose(fptr);
 }*/
-void readFile2(char* input_file, struct hashmap *hm)
+void readFile2(char* input_file,struct hashmap *hm)
 {
   FILE *fptr;
+  int i;
   char curr;
   fptr = fopen(input_file, "r");
-  printf("opened the file\n");
+  //printf("opened file %s\n",input_file);
   while(curr!=EOF)
   {
+    //printf("Starting to read a new word\n");
     char arr[50];
     curr = (char)fgetc(fptr);
     int k=0;
@@ -77,7 +79,13 @@ void readFile2(char* input_file, struct hashmap *hm)
     }
     arr[k] = 0;
     hm_put(hm,arr,input_file,1);
+    for(i=0; i<k; i++)
+    {
+      printf("%c",arr[i]);
+    }
+    printf(" \n");
   }
+  printf("\n");
 }
 void readFile3(char* input_file)
 {
@@ -98,12 +106,15 @@ void readFile3(char* input_file)
       curr = (char)fgetc(fptr);
     }
     arr[k] = 0;
-    //hm_put(hm,arr,input_file,1);
     for(i=0; i<k; i++)
     {
       printf("%c",arr[i]);
     }
-    printf(" ");
+    printf(" \n");
+    if(curr == EOF)
+    {
+      return;
+    }
   }
   printf("\n");
 }
