@@ -3,9 +3,9 @@
 #include "hashmap.h"
 
 void testWithoutIO(void);
-//void readFile(char* input_file, struct hashmap *hm);
 void readFile2(char* input_file, struct hashmap *hm);
 void readFile3(char* input_file);
+void hm_print(struct hashmap* hm);
 void testWithoutIO(void)
 {
   struct hashmap *hm = hm_create(8);
@@ -36,38 +36,6 @@ void testWithoutIO(void)
   printf("%i\n",hm_get(hm,"word","doc"));//test if its really gone
   printf("___________________________________________________________\n");
 }
-/*void readFile(char* input_file, struct hashmap *hm)
-{
-  printf("I made it into readFile method\n");
-  FILE *fptr;
-  char curr;
-  fptr = fopen(input_file, "r");
-  printf("opened the file\n");
-  curr = fgetc(fptr);
-  char* arr[100][50];
-  int index=0;
-  printf("got first char\n");
-  while(curr != EOF)
-  {
-    printf("current char is %c\n",curr);
-    if(curr ==' ')
-    {
-      printf("curr is a ' '\n");
-      hm_put(hm,word,input_file,1);
-      index = 0;
-      word = NULL;
-    }
-    else
-    {
-      printf("current word is %s\n",word);
-      arr[i][k++] = curr;
-      index++;
-    }
-    fptr++;
-    curr = fgetc(fptr);
-  }
-  fclose(fptr);
-}*/
 void readFile2(char* input_file,struct hashmap *hm)
 {
   FILE *fptr;
@@ -123,27 +91,50 @@ void readFile3(char* input_file)
     {
       printf("%c",arr[i]);
     }
-    printf(" \n");
+    printf(" ");
     if(curr == EOF)
     {
+      printf("\n");
       return;
     }
   }
-  printf("\n");
+}
+void hm_print(struct hashmap* hm)
+{
+  int i;
+  struct llnode* iter;
+  for(i=0; i<hm->num_buckets; i++)
+  {
+    struct llnode* headBucket = hm->map[i];
+    printf("Bucket number %i:\n",i);
+    iter = headBucket;
+    while(iter!=NULL)
+    {
+      printf("Word = %s, Document ID = %s, Number of Occurrences = %i\n",iter->word,iter->document_id,iter->num_occurrences);
+      iter = iter->next;
+    }
+  }
 }
 int main(void)
 {
-  testWithoutIO();
+  //testWithoutIO();
   
- // struct hashmap *hm = hm_create(17);
-  //printf("I made a hashmap\n");
-  /*readFile3("input1.txt");
+  
+ /* readFile3("input1.txt");
+  printf("\n");
   readFile3("input2.txt");
-  readFile3("input3.txt");*/
-  
-  /*readFile2("input1.txt",hm);
+  printf("\n");
+  readFile3("input3.txt");
+  printf("\n");*/
+  printf("___________________________________________________________\n");
+  printf("IO test with hashmap\n");
+  struct hashmap *hm = hm_create(17);
+  printf("I made a hashmap\n");
+  readFile2("input1.txt",hm);
   readFile2("input2.txt",hm);
-  readFile2("input3.txt",hm);*/
-  
+  readFile2("input3.txt",hm);
+  printf("___________________________________________________________\n");
+  hm_print(hm);
+  printf("___________________________________________________________\n");
 }
 

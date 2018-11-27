@@ -5,8 +5,8 @@
 
 struct hashmap* hm_create(int num_buckets)
 {
-    struct hashmap* hm = (struct hashmap*)malloc(sizeof(struct hashmap));
-    hm->map = (struct llnode**)malloc(sizeof(struct llnode));
+    struct hashmap* hm = (struct hashmap*)calloc(1,sizeof(struct hashmap));
+    hm->map = (struct llnode**)calloc(num_buckets,sizeof(struct llnode));
     hm->num_buckets = num_buckets;
     hm->num_elements = 0;
     return hm;
@@ -41,41 +41,63 @@ int hm_get(struct hashmap* hm, char* word, char* document_id)
     printf("the number of occurrences for %s %s is 0. Returning -1.\n",word,document_id);
     return -1;
 }
+/* This method takes a given word-document pair and updates the num_occurrences if it exists
+*  or it creates a new llnode for that pair and inputs the num_occurrences there
+*/
 void hm_put(struct hashmap* hm, char* word, char* document_id, int num_occurrences){
-	int bucket = hash(hm, word, document_id);
+    int bucket = hash(hm,word,document_id);
   printf("Adding word: %s doc: %s to bucket %i\n",word,document_id,bucket);
-	struct llnode* headBucket = hm->map[bucket];
-	if (headBucket == NULL) {
-		struct llnode* new_node = (struct llnode*) calloc(1,sizeof(struct llnode));
-		hm->map[bucket] = new_node;
-		new_node->word = word;
-		new_node->document_id = document_id;
-		new_node->num_occurrences = num_occurrences;
+    struct llnode *headBucket = hm->map[bucket];
+  //printf("head node is %s %s\n", headBucket->word,headBucket->document_id);
+    if (headBucket==NULL) 
+  {
+    printf("nothing in the bucket yet\n");
+        struct llnode* new_node = (struct llnode*) calloc(1,sizeof(struct llnode));
+    printf("allocated space for new node\n");
+        hm->map[bucket] = new_node;
+        new_node->word = word;
+        new_node->document_id = document_id;
+        new_node->num_occurrences = num_occurrences;
     printf("Added to the front of bucket %i\n",bucket);
     hm->num_elements += 1;
-	}
-	else {
-		struct llnode* curr = headBucket;
-		struct llnode* prev = headBucket;
-		while (curr != NULL) {
-			if (strcmp(curr->word, word) == 0 && strcmp(curr->document_id, document_id) == 0) {
-				curr->num_occurrences += num_occurrences;
-				printf("after update number of occur in hm_put: %s %d\n", word, curr->num_occurrences);
-				return;
-			}
-			prev = curr;
-			curr = curr->next;
-		}
-		/* Add node to end of list */
+    }
+    else {
+        struct llnode* curr = headBucket;
+        struct llnode* prev = headBucket;
+        while (curr != 0) {
+            if (strcmp(curr->word, word) == 0 && strcmp(curr->document_id, document_id) == 0) {
+                curr->num_occurrences += num_occurrences;
+                printf("after update, number of occur in hm_put: %s %d\n", word, curr->num_occurrences);
+                return;
+            }
+            prev = curr;
+            curr = curr->next;
+        }
+        /* Add node to end of list */
     printf("adding to the end of bucket %i\n",bucket);
-		struct llnode* new_node = (struct llnode*) calloc(1,sizeof(struct llnode));
-		new_node->word = word;
-		new_node->document_id = document_id;
-		new_node->num_occurrences = num_occurrences;
-		prev->next = new_node;
-		/* Increment num_elements */
-		hm->num_elements += 1;
-	}
+        struct llnode* new_node = (struct llnode*) calloc(1,sizeof(struct llnode));
+        new_node->word = word;
+        new_node->document_id = document_id;
+        new_node->num_occurrences = num_occurrences;
+        prev->next = new_node;
+        hm->num_elements += 1;
+    }
+}
+
+int hash(struct hashmap* hm, char* word, char* document_id)
+{
+    char* a;
+    int i;
+    int sum = 0;
+    char* getRidOfDumbError = document_id;
+    for(a = word; *a!='\0'; a++)
+    {
+      i = (int) *a;
+      sum = sum + i;
+    }
+    sum = sum%hm->num_buckets;
+    getRidOfDumbError++;
+    return sum;
 }
 void hm_destroy(struct hashmap* hm)
 {
@@ -99,21 +121,6 @@ void hm_destroy(struct hashmap* hm)
     printf("destroying map and hm");
     free(hm->map);
     free(hm);
-}
-int hash(struct hashmap* hm, char* word, char* document_id)
-{
-    char* a;
-    int i;
-    int sum = 0;
-    char* getRidOfDumbError = document_id;
-    for(a = word; *a!='\0'; a++)
-    {
-      i = (int) *a;
-      sum = sum + i;
-    }
-    sum = sum%hm->num_buckets;
-    getRidOfDumbError++;
-    return sum;
 }
 void hm_remove(struct hashmap* hm, char* word, char* document_id)
 {
