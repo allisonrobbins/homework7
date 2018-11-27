@@ -60,9 +60,9 @@ void readFile(char* input_file, struct hashmap *hm)
 int main(void)
 {
   testWithoutIO();
-  struct hashmap *hm = hm_create(7);
+  /*struct hashmap *hm = hm_create(7);
   printf("I made a hashmap\n");
-  //readFile("input1.txt",hm);
-  //readFile("input2.txt",hm);
-  //readFile("input3.txt",hm);
+  readFile("input1.txt",hm);
+  readFile("input2.txt",hm);
+  readFile("input3.txt",hm);*/
 }
