@@ -3,7 +3,9 @@
 #include "hashmap.h"
 
 void testWithoutIO(void);
-void readFile(char* input_file, struct hashmap *hm);
+//void readFile(char* input_file, struct hashmap *hm);
+void readFile2(char* input_file, struct hashmap *hm);
+void readFile3(char* input_file);
 void testWithoutIO(void)
 {
   struct hashmap *hm = hm_create(7);
@@ -25,7 +27,7 @@ void testWithoutIO(void)
   printf("___________________________________________________________\n");
   hm_destroy(hm);
 }
-void readFile(char* input_file, struct hashmap *hm)
+/*void readFile(char* input_file, struct hashmap *hm)
 {
   printf("I made it into readFile method\n");
   FILE *fptr;
@@ -33,7 +35,7 @@ void readFile(char* input_file, struct hashmap *hm)
   fptr = fopen(input_file, "r");
   printf("opened the file\n");
   curr = fgetc(fptr);
-  char* word;
+  char* arr[100][50];
   int index=0;
   printf("got first char\n");
   while(curr != EOF)
@@ -49,21 +51,69 @@ void readFile(char* input_file, struct hashmap *hm)
     else
     {
       printf("current word is %s\n",word);
-      word[index] = curr;
+      arr[i][k++] = curr;
       index++;
     }
     fptr++;
     curr = fgetc(fptr);
   }
   fclose(fptr);
+}*/
+void readFile2(char* input_file, struct hashmap *hm)
+{
+  FILE *fptr;
+  char curr;
+  fptr = fopen(input_file, "r");
+  printf("opened the file\n");
+  while(curr!=EOF)
+  {
+    char arr[50];
+    curr = (char)fgetc(fptr);
+    int k=0;
+    while(curr!=' ')
+    {
+      arr[k++] = curr;
+      curr = (char)fgetc(fptr);
+    }
+    arr[k] = 0;
+    hm_put(hm,arr,input_file,1);
+  }
+}
+void readFile3(char* input_file)
+{
+  FILE *fptr;
+  int i;
+  char curr;
+  fptr = fopen(input_file, "r");
+  //printf("opened file %s\n",input_file);
+  while(curr!=EOF)
+  {
+    //printf("Starting to read a new word\n");
+    char arr[50];
+    curr = (char)fgetc(fptr);
+    int k=0;
+    while(curr!=' ')
+    {
+      arr[k++] = curr;
+      curr = (char)fgetc(fptr);
+    }
+    arr[k] = 0;
+    //hm_put(hm,arr,input_file,1);
+    for(i=0; i<k; i++)
+    {
+      printf("%c",arr[i]);
+    }
+    printf(" ");
+  }
+  printf("\n");
 }
 int main(void)
 {
-  testWithoutIO();
-  /*struct hashmap *hm = hm_create(7);
+  //testWithoutIO();
+  //struct hashmap *hm = hm_create(17);
   printf("I made a hashmap\n");
-  readFile("input1.txt",hm);
-  readFile("input2.txt",hm);
-  readFile("input3.txt",hm);*/
+  readFile3("input1.txt");
+  readFile3("input2.txt");
+  readFile3("input3.txt");
 }
 
